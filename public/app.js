@@ -1,0 +1,96 @@
+// app.js
+
+// Select DOM elements
+const weatherDataContainer = document.getElementById("weather-data");
+const mapContainer = document.getElementById("map-container");
+const additionalInfoContainer = document.getElementById("additional-info");
+
+// API Keys (replace with your own)
+const openWeatherApiKey = "0bdeff48e29ba2ed32dfff8d7fb59db9";
+
+// Fetch weather data
+async function fetchWeather(city) {
+    try {
+        const response = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${openWeatherApiKey}&units=metric`
+        );
+        const data = await response.json();
+        displayWeather(data);
+        
+        displayMap(data.coord.lat, data.coord.lon);
+    } catch (error) {
+        console.error("Error fetching weather data:", error);
+    }
+}
+
+// Display weather data
+function displayWeather(data) {
+    console.log(data); 
+    const weatherHTML = `
+        <p><strong>Temperature:</strong> ${data.main.temp} °C</p>
+        <p><strong>Description:</strong> ${data.weather[0].description}</p>
+        <p><strong>Feels Like:</strong> ${data.main.feels_like} °C</p>
+        <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+        <p><strong>Pressure:</strong> ${data.main.pressure} hPa</p>
+        <p><strong>Wind Speed:</strong> ${data.wind.speed} m/s</p>
+        <p><strong>Country:</strong> ${data.sys.country}</p>
+    `;
+    weatherDataContainer.innerHTML = weatherHTML;
+}
+
+function displayMap(lat, lon) {
+    // if (!L) {
+    //     console.error("Leaflet is not loaded. Please include the library.");
+    //     return;
+    // }
+    const map = L.map(mapContainer).setView([lat, lon], 13);
+    L.tileLayer(`https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`).addTo(map);
+    L.marker([lat, lon]).addTo(map).bindPopup("City Location").openPopup();
+}
+
+
+// Fetch additional API data
+async function fetchAdditionalData(city) {
+    const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${openWeatherApiKey}&units=metric`
+    );
+    const data_weather = await response.json();
+    try {
+          const response = await fetch(
+            `https://newsapi.org/v2/top-headlines?q=${data_weather.sys.country}&apiKey=841bbf6d69a24cb6a7fdbb01d5c6b081`
+            );
+            console.log(data_weather.sys.country);
+            const data = await response.json();
+            displayAdditionalInfo(data);
+    } catch (error) {
+        console.error("Error fetching additional API data:", error);
+    }
+}
+
+
+// Display additional API data
+function displayAdditionalInfo(data) {
+    console.log(data)
+    if (!data.articles || data.articles.length === 0) {
+        additionalInfoContainer.innerHTML = "<p>No news available.</p>";
+        return;
+    }
+    const newsHTML = data.articles.slice(0, 5).map(article => `
+        <div>
+            <h4>${article.title}</h4>
+            <p>${article.description}</p>
+            <a href="${article.url}" target="_blank">Read more</a>
+        </div>
+    `).join("");
+    additionalInfoContainer.innerHTML = newsHTML;
+}
+
+
+// Initialize application
+function init() {
+    const defaultCity = "moscow"; // Replace with user input if needed
+    fetchWeather(defaultCity);
+    fetchAdditionalData(defaultCity);
+}
+
+init();
