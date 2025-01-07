@@ -88,7 +88,7 @@ function displayAdditionalInfo(data) {
 
 // Initialize application
 function init() {
-    const defaultCity = "moscow"; // Replace with user input if needed
+    const defaultCity = "paris"; // Replace with user input if needed
     fetchWeather(defaultCity);
     fetchAdditionalData(defaultCity);
 }
