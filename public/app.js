@@ -117,7 +117,7 @@ function displayTriviaInfo(data, data_weather) {
 
 // Initialize application
 function init() {
-    const defaultCity = "Paris"; // Replace with user input if needed
+    const defaultCity = "paris"; // Replace with user input if needed
     fetchWeather(defaultCity);
     fetchAdditionalData(defaultCity);
     fetchTriviaData(defaultCity);
