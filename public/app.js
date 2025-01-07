@@ -1,14 +1,13 @@
-// app.js
-
-// Select DOM elements
 const weatherDataContainer = document.getElementById("weather-data");
 const mapContainer = document.getElementById("map-container");
 const additionalInfoContainer = document.getElementById("additional-info");
+const trivialInfoContainer = document.getElementById("trivia-info");
+const headerText = document.getElementById("header_text") 
 
-// API Keys (replace with your own)
 const openWeatherApiKey = "0bdeff48e29ba2ed32dfff8d7fb59db9";
+const continentlTriviaApiKey = "sk-ou3O677da5dac035d494";
+const newsapiApiKey = "841bbf6d69a24cb6a7fdbb01d5c6b081";
 
-// Fetch weather data
 async function fetchWeather(city) {
     try {
         const response = await fetch(
@@ -23,7 +22,6 @@ async function fetchWeather(city) {
     }
 }
 
-// Display weather data
 function displayWeather(data) {
     console.log(data); 
     const weatherHTML = `
@@ -49,7 +47,6 @@ function displayMap(lat, lon) {
 }
 
 
-// Fetch additional API data
 async function fetchAdditionalData(city) {
     const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${openWeatherApiKey}&units=metric`
@@ -57,9 +54,9 @@ async function fetchAdditionalData(city) {
     const data_weather = await response.json();
     try {
           const response = await fetch(
-            `https://newsapi.org/v2/top-headlines?q=${data_weather.sys.country}&apiKey=841bbf6d69a24cb6a7fdbb01d5c6b081`
+            `https://newsapi.org/v2/top-headlines?q=${data_weather.sys.country}&apiKey=${newsapiApiKey}`
             );
-            console.log(data_weather.sys.country);
+            // console.log(data_weather.sys.country);
             const data = await response.json();
             displayAdditionalInfo(data);
     } catch (error) {
@@ -68,9 +65,8 @@ async function fetchAdditionalData(city) {
 }
 
 
-// Display additional API data
 function displayAdditionalInfo(data) {
-    console.log(data)
+    // console.log(data)
     if (!data.articles || data.articles.length === 0) {
         additionalInfoContainer.innerHTML = "<p>No news available.</p>";
         return;
@@ -84,13 +80,48 @@ function displayAdditionalInfo(data) {
     `).join("");
     additionalInfoContainer.innerHTML = newsHTML;
 }
+async function fetchTriviaData(city) {
+    try {
+        const response = await fetch(
+            `https://continentl.com/api/country-list?key=${continentlTriviaApiKey}`
+        );
+        const data = await response.json();
+        const response_weather = await fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${openWeatherApiKey}&units=metric`
+        );
+        const data_weather = await response_weather.json();
+        displayTriviaInfo(data, data_weather);
+    } catch (error) {
+        console.error("Error fetching trivia data:", error);
+    }
+}
+
+function displayTriviaInfo(data, data_weather) {
+    for (let cntr in data){
+
+        if (data[cntr].code == data_weather.sys.country) {
+            // console.log(data[cntr]); 
+            const triviaHTML = `
+                <p><strong>Official language:</strong> ${data[cntr].official_language}</p>
+                <p><strong>Capital:</strong> ${data[cntr].capital}</p>
+                <p><strong>Region:</strong> ${data[cntr].region}</p>
+            `;
+            trivialInfoContainer.innerHTML += triviaHTML;   
+            
+            
+        }
+    }
+}
+
 
 
 // Initialize application
 function init() {
-    const defaultCity = "moscow"; // Replace with user input if needed
+    const defaultCity = "Paris"; // Replace with user input if needed
     fetchWeather(defaultCity);
     fetchAdditionalData(defaultCity);
+    fetchTriviaData(defaultCity);
+    headerText.innerHTML += `Weather And Information Of The City Of ${defaultCity}`
 }
 
 init();
