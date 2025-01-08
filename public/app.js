@@ -23,6 +23,7 @@ async function fetchWeather(city) {
 }
 
 function displayWeather(data) {
+
     console.log(data); 
     const weatherHTML = `
         <p><strong>Temperature:</strong> ${data.main.temp} °C</p>
@@ -32,6 +33,10 @@ function displayWeather(data) {
         <p><strong>Pressure:</strong> ${data.main.pressure} hPa</p>
         <p><strong>Wind Speed:</strong> ${data.wind.speed} m/s</p>
         <p><strong>Country:</strong> ${data.sys.country}</p>
+        <p><strong>Longtitude:</strong> ${data.coord.lon} m/s</p>
+        <p><strong>Latitude:</strong> ${data.coord.lat}</p>
+        <p><strong>Rain Volume:</strong> ${data.rain["1h"]}</p>
+
     `;
     weatherDataContainer.innerHTML = weatherHTML;
 }
@@ -100,7 +105,7 @@ function displayTriviaInfo(data, data_weather) {
     for (let cntr in data){
 
         if (data[cntr].code == data_weather.sys.country) {
-            // console.log(data[cntr]); 
+            console.log(data[cntr]); 
             const triviaHTML = `
                 <p><strong>Official language:</strong> ${data[cntr].official_language}</p>
                 <p><strong>Capital:</strong> ${data[cntr].capital}</p>
@@ -117,7 +122,7 @@ function displayTriviaInfo(data, data_weather) {
 
 // Initialize application
 function init() {
-    const defaultCity = "paris"; // Replace with user input if needed
+    const defaultCity = "Paris"; // Replace with user input if needed
     fetchWeather(defaultCity);
     fetchAdditionalData(defaultCity);
     fetchTriviaData(defaultCity);
